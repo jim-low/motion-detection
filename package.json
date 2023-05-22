@@ -1,0 +1,23 @@
+{
+  "name": "motion-detection",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+      "start": "npx webpack && python3 -m http.server 3000"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "handtrackjs": "^0.1.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.21.8",
+    "@babel/preset-env": "^7.21.5",
+    "babel-loader": "^9.1.2",
+    "nodemon": "^2.0.22",
+    "webpack": "^5.83.1",
+    "webpack-cli": "^5.1.1"
+  }
+}
