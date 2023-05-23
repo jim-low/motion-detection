@@ -1,14 +1,16 @@
 import * as HandTrack from 'handtrackjs'
+import * as THREE from 'three'
 
+// handtrack stuff
+const container = document.getElementById("bigbigidk");
 const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
-const toggleButton = document.getElementById("toggleButton");
 
-const leftHandResultText = document.getElementById("leftHand")
-const rightHandResultText = document.getElementById("rightHand")
+// const leftHandResultText = document.getElementById("leftHand")
+// const rightHandResultText = document.getElementById("rightHand")
 
-let isVideo = false;
+let isVideo = true;
 let model = null;
 
 video.hidden = true
@@ -20,29 +22,40 @@ const modelParams = {
     scoreThreshold: 0.6, // confidence threshold for predictions.
 };
 
+// three js stuff
+const scene = new THREE.Scene()
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+const renderer = new THREE.WebGLRenderer()
+renderer.setSize(window.innerWidth / 2, window.innerHeight / 2)
+container.appendChild(renderer.domElement)
+
+const cubeGeo = new THREE.BoxGeometry( 1, 1, 1 );
+const cubeMat = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+const cube = new THREE.Mesh(cubeGeo, cubeMat);
+cube.rotation.z = 5
+scene.add(cube);
+
+// wireframe
+const wireGeo = new THREE.EdgesGeometry(cube.geometry)
+const wireMat = new THREE.LineBasicMaterial({ color: 0x000000 })
+const wireframe = new THREE.LineSegments(wireGeo, wireMat)
+cube.add(wireframe)
+
+camera.position.z = 5;
+
+const speed = 0.05
+
+function animateThreeScene() {
+    requestAnimationFrame(animateThreeScene)
+    // cube.rotateZ(0.01)
+    renderer.render(scene, camera)
+}
+
 function startVideo() {
     HandTrack.startVideo(video).then(function (status) {
-        console.log("video started", status);
-        if (status) {
-            isVideo = true;
-            runDetection();
-        } else {
-        }
+        runDetection();
     });
 }
-
-function toggleVideo() {
-    if (!isVideo) {
-        startVideo();
-    } else {
-        HandTrack.stopVideo(video);
-        isVideo = false;
-    }
-}
-
-toggleButton.addEventListener("click", function () {
-    toggleVideo();
-});
 
 function runDetection() {
     model.detect(video).then((predictions) => {
@@ -51,17 +64,25 @@ function runDetection() {
 
         for (const prediction of predictions) {
             if (prediction.label === "face") {
-                leftHandResultText.innerText = ""
-                rightHandResultText.innerText = ""
+                // leftHandResultText.innerText = ""
+                // rightHandResultText.innerText = ""
                 continue
             }
 
             const leftDistance = prediction.bbox[0]
             if (leftDistance < (canvas.width / 2)) {
-                leftHandResultText.innerText = "left hand " + prediction.label
+                // leftHandResultText.innerText = "left hand " + prediction.label
+
+                if (prediction.label === "open") {
+                    cube.rotateY(-speed)
+                }
             }
             else {
-                rightHandResultText.innerText = "right hand " + prediction.label
+                // rightHandResultText.innerText = "right hand " + prediction.label
+
+                if (prediction.label === "open") {
+                    cube.rotateY(speed)
+                }
             }
         }
 
@@ -76,5 +97,7 @@ HandTrack.load(modelParams).then((lmodel) => {
     // detect objects in the image.
     model = lmodel;
     console.log(model);
-    toggleButton.disabled = false;
+    startVideo()
 });
+
+animateThreeScene()
