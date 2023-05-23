@@ -7,9 +7,6 @@ const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
 
-// const leftHandResultText = document.getElementById("leftHand")
-// const rightHandResultText = document.getElementById("rightHand")
-
 let isVideo = true;
 let model = null;
 
@@ -47,7 +44,6 @@ const speed = 0.05
 
 function animateThreeScene() {
     requestAnimationFrame(animateThreeScene)
-    // cube.rotateZ(0.01)
     renderer.render(scene, camera)
 }
 
@@ -64,22 +60,16 @@ function runDetection() {
 
         for (const prediction of predictions) {
             if (prediction.label === "face") {
-                // leftHandResultText.innerText = ""
-                // rightHandResultText.innerText = ""
                 continue
             }
 
             const leftDistance = prediction.bbox[0]
             if (leftDistance < (canvas.width / 2)) {
-                // leftHandResultText.innerText = "left hand " + prediction.label
-
                 if (prediction.label === "open") {
                     cube.rotateY(-speed)
                 }
             }
             else {
-                // rightHandResultText.innerText = "right hand " + prediction.label
-
                 if (prediction.label === "open") {
                     cube.rotateY(speed)
                 }
