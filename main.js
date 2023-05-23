@@ -5,6 +5,9 @@ const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
 const toggleButton = document.getElementById("toggleButton");
 
+const leftHandResultText = document.getElementById("leftHand")
+const rightHandResultText = document.getElementById("rightHand")
+
 let isVideo = false;
 let model = null;
 
@@ -45,6 +48,23 @@ function runDetection() {
     model.detect(video).then((predictions) => {
         console.log("Predictions: ", predictions);
         model.renderPredictions(predictions, canvas, context, video);
+
+        for (const prediction of predictions) {
+            if (prediction.label === "face") {
+                leftHandResultText.innerText = ""
+                rightHandResultText.innerText = ""
+                continue
+            }
+
+            const leftDistance = prediction.bbox[0]
+            if (leftDistance < (canvas.width / 2)) {
+                leftHandResultText.innerText = "left hand " + prediction.label
+            }
+            else {
+                rightHandResultText.innerText = "right hand " + prediction.label
+            }
+        }
+
         if (isVideo) {
             requestAnimationFrame(runDetection);
         }
