@@ -1,29 +1,60 @@
 import * as HandTrack from 'handtrackjs'
 
-const video = document.getElementById("videoElement")
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const context = canvas.getContext("2d");
+const toggleButton = document.getElementById("toggleButton");
 
-navigator.mediaDevices.getUserMedia({ video: true })
-    .then(doSomethingWithHandTrackIGuess)
-    .catch(e => {
-    })
+let isVideo = false;
+let model = null;
 
-document.getElementById('stopButton').addEventListener('click', () => {
-    const stream = video.srcObject
-    const tracks = stream.getTracks()
+video.hidden = true
 
-    for (let i = 0; i < tracks.length; ++i) {
-        tracks[i].stop()
-    }
+const modelParams = {
+    flipHorizontal: true, // flip e.g for video
+    maxNumBoxes: 20, // maximum number of boxes to detect
+    iouThreshold: 0.5, // ioU threshold for non-max suppression
+    scoreThreshold: 0.6, // confidence threshold for predictions.
+};
 
-    video.srcObject = null
-})
-
-async function doSomethingWithHandTrackIGuess(stream) {
-    video.srcObject = stream
-
-    console.log("this is being run")
-    const model = await HandTrack.load()
-    console.log("and so is this")
-    const predictions = await model.detect(video.srcObject)
-    console.log(predictions)
+function startVideo() {
+    HandTrack.startVideo(video).then(function (status) {
+        console.log("video started", status);
+        if (status) {
+            isVideo = true;
+            runDetection();
+        } else {
+        }
+    });
 }
+
+function toggleVideo() {
+    if (!isVideo) {
+        startVideo();
+    } else {
+        HandTrack.stopVideo(video);
+        isVideo = false;
+    }
+}
+
+toggleButton.addEventListener("click", function () {
+    toggleVideo();
+});
+
+function runDetection() {
+    model.detect(video).then((predictions) => {
+        console.log("Predictions: ", predictions);
+        model.renderPredictions(predictions, canvas, context, video);
+        if (isVideo) {
+            requestAnimationFrame(runDetection);
+        }
+    });
+}
+
+// load the model
+HandTrack.load(modelParams).then((lmodel) => {
+    // detect objects in the image.
+    model = lmodel;
+    console.log(model);
+    toggleButton.disabled = false;
+});

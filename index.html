@@ -4,11 +4,18 @@
         <script src="dist/bundle.js" defer></script>
     </head>
     <body>
-        <div id="container">
-            <video style="transform: scale(-1, 1);" autoplay="true" id="videoElement"></video>
+        <div id="bigbigidk" style="display: flex;">
+            <div id="container" style="position: relative; transfrom: translate(-50%, -50%)">
+                <video autoplay="autoplay" id="video"></video>
+                <canvas id="canvas"></canvas>
+            </div>
+            <div id="result" style="display: flex; flex-direction: column;">
+                <p style="display: block; text-alignment: center;">left hand point</p>
+                <p style="display: block; text-alignment: center;">right hand close</p>
+            </div>
+            <button id="toggleButton" style="position: absolute; top: 10px; right: 10px">
+                Toggle Video
+            </button>
         </div>
-        <button id="stopButton" style="position: absolute; top: 10px; right: 10px">
-            Stop
-        </button>
     </body>
 </html>

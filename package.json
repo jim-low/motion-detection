@@ -2,7 +2,7 @@
   "name": "motion-detection",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
       "start": "npx webpack && python3 -m http.server 3000"
   },
